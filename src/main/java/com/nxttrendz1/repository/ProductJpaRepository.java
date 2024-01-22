@@ -1,5 +1,11 @@
 package com.nxttrendz1.repository;
 
-public class ProductJpaRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.nxttrendz1.model.Product;
+
+public interface ProductJpaRepository extends JpaRepository<Product,Integer> {
+	
+	
 
 }
