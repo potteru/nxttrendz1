@@ -11,37 +11,42 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nxttrendz1.model.Product;
 import com.nxttrendz1.model.Review;
 import com.nxttrendz1.service.ReviewJpaService;
 
 @RestController
 public class ReviewController {
     @Autowired
-    ReviewJpaService reviewService;
+    private ReviewJpaService reviewJpaService;
 
-    @GetMapping("/reviews")
+    @GetMapping("/products/reviews")
     public ArrayList<Review> getReviews() {
-        return reviewService.getReviews();
+        return reviewJpaService.getReviews();
     }
 
-    @GetMapping("/reviews/{reviewId}")
+    @GetMapping("/products/reviews/{reviewId}")
     public Review getReviewById(@PathVariable("reviewId") int reviewId) {
-        return reviewService.getReviewById(reviewId);
+        return reviewJpaService.getReviewById(reviewId);
     }
 
-    @PostMapping("/reviews")
+    @PostMapping("/products/reviews")
     public Review addReview(@RequestBody Review review) {
-        return reviewService.addReview(review);
+        return reviewJpaService.addReview(review);
     }
 
-    @PutMapping("/reviews/{reviewId}")
+    @PutMapping("/products/reviews/{reviewId}")
     public Review updateReview(@PathVariable("reviewId") int reviewId, @RequestBody Review review) {
-        return reviewService.updateReview(reviewId, review);
+        return reviewJpaService.updateReview(reviewId, review);
     }
 
-    @DeleteMapping("/reviews/{reviewId}")
-    public void deleteReview(@PathVariable("reviewId") int reviewId) {
-        reviewService.deleteReview(reviewId);
+    @DeleteMapping("/products/reviews/{reviewId}")
+    public void deleteReview(@PathVariable int reviewId) {
+        reviewJpaService.deleteReview(reviewId);
     }
 
+    @GetMapping("/reviews/{reviewId}/product")
+    public Product getReviewProduct(@PathVariable int reviewId) {
+        return reviewJpaService.getReviewProduct(reviewId);
+    }
 }

@@ -1,43 +1,93 @@
 package com.nxttrendz1.service;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.nxttrendz1.model.Product;
 import com.nxttrendz1.model.Review;
+import com.nxttrendz1.repository.ProductJpaRepository;
+import com.nxttrendz1.repository.ReviewJpaRepository;
 import com.nxttrendz1.repository.ReviewRepository;
 
 @Service
-public class ReviewJpaService implements ReviewRepository{
+public class ReviewJpaService implements ReviewRepository {
+    @Autowired
+    private ReviewJpaRepository reviewJpaRepository;
 
-	@Override
-	public ArrayList<Review> getReviews() {
-		
-		return null;
-	}
+    @Autowired
+    private ProductJpaRepository productJpaRepository;
 
-	@Override
-	public Review addReview(Review review) {
-		
-		return null;
-	}
+    public ArrayList<Review> getReviews() {
+        List<Review> reviewsList = reviewJpaRepository.findAll();
+        ArrayList<Review> reviews = new ArrayList<>(reviewsList);
+        return reviews;
+    }
 
-	@Override
-	public Review getReviewById(int reviewId) {
-		
-		return null;
-	}
+    public Review getReviewById(int reviewId) {
+        try {
+            Review review = reviewJpaRepository.findById(reviewId).get();
+            return review;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+    }
 
-	@Override
-	public Review updateReview(int reviewId, Review review) {
-		
-		return null;
-	}
+    public Review addReview(Review review) {
+        Product product = review.getProduct();
+        int productId = product.getProductId();
 
-	@Override
-	public void deleteReview(int reviewId) {
-		
-		
-	}
-	
+        try {
+            product = productJpaRepository.findById(productId).get();
+            review.setProduct(product);
+            reviewJpaRepository.save(review);
+            return review;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    public Review updateReview(int reviewId, Review review) {
+        try {
+            Review newReview = reviewJpaRepository.findById(reviewId).get();
+            if(review.getProduct() != null) {
+                int productId = review.getProduct().getProductId();
+                Product newProduct = productJpaRepository.findById(productId).get();
+                newReview.setProduct(newProduct);
+            }
+            if(review.getReviewContent()!=null){
+                newReview.setReviewContent(review.getReviewContent());
+            }
+            if(review.getRating()!=0){
+                newReview.setRating(review.getRating());
+            }
+            reviewJpaRepository.save(newReview);
+            return newReview;
+        } catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    public void deleteReview(int reviewId) {
+        try {
+            reviewJpaRepository.deleteById(reviewId);
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        throw new ResponseStatusException(HttpStatus.NO_CONTENT);
+    }
+
+    public Product getReviewProduct(int reviewId) {
+        try {
+            Review review = reviewJpaRepository.findById(reviewId).get();
+            Product product = review.getProduct();
+            return product;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+    }
 }
